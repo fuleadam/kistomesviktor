@@ -175,6 +175,12 @@
       radial-gradient(ellipse at 30% 20%, color-mix(in srgb, var(--gold) 30%, transparent), transparent 55%),
       linear-gradient(155deg, var(--moss-deep), var(--ink) 78%);
   }
+  @media (max-width: 620px) {
+    .video-embed {
+      aspect-ratio: auto;
+      height: 330px;
+    }
+  }
   .video-embed iframe {
     position: absolute;
     inset: 0;
@@ -688,8 +694,7 @@
       title="Meghívó videó &ndash; Kistom és Viktor 50"
       allow="autoplay; fullscreen"
       allowfullscreen
-      loading="lazy"
-      referrerpolicy="no-referrer"></iframe>
+      loading="lazy"></iframe>
   </div>
   <p class="video-caption">Ha a videó nem indulna el, <a href="https://drive.google.com/file/d/1-rR02RNfI63ZmYYhKfs4uKSzFMs9cFyu/view" target="_blank" rel="noopener">nyisd meg a Google Drive-ban</a>.</p>
 </div>
