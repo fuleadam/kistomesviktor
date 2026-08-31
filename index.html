@@ -164,9 +164,10 @@
   .video-section { padding: 8px 24px 8px; }
   .video-embed {
     position: relative;
-    max-width: 760px;
+    width: 100%;
+    max-width: 370px;
     margin: 0 auto;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 9 / 16;
     border-radius: 14px;
     overflow: hidden;
     border: 1px solid var(--card-line);
@@ -175,19 +176,73 @@
       radial-gradient(ellipse at 30% 20%, color-mix(in srgb, var(--gold) 30%, transparent), transparent 55%),
       linear-gradient(155deg, var(--moss-deep), var(--ink) 78%);
   }
-  @media (max-width: 620px) {
-    .video-embed {
-      aspect-ratio: auto;
-      height: 330px;
-    }
+  /* Boritolap: egy koppintas -> a video HANGGAL indul, az oldalon belul.
+     (A bongeszok hanggal soha nem engedik az automatikus inditast,
+      ezert kell a felhasznaloi koppintas.) */
+  .video-cover {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px;
+    margin: 0;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+    color: var(--ground-soft);
+    text-align: center;
+    background: transparent;
+    -webkit-tap-highlight-color: transparent;
   }
-  .video-embed iframe {
+  .video-cover .ring {
+    width: 74px;
+    height: 74px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--ground) 94%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 26px -8px rgba(0, 0, 0, 0.5);
+    transition: transform 0.2s ease;
+  }
+  .video-cover .ring svg { color: var(--wine); margin-left: 4px; }
+  .video-cover:hover .ring,
+  .video-cover:focus-visible .ring { transform: scale(1.07); }
+  .video-cover .cover-title {
+    font-family: "Fraunces", ui-serif, Georgia, serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  .video-cover .cover-sub {
+    font-family: "Karla", ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.76rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .video-cover .ring { transition: none; }
+  }
+
+  .video-embed iframe,
+  .video-embed video {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     border: 0;
     display: block;
+    object-fit: contain;
+    background: #000;
+  }
+  /* Alacsony kepernyon (fekvo telefon, kis laptop) ne logjon ki a video */
+  @media (max-height: 760px) and (min-width: 700px) {
+    .video-embed { max-width: min(370px, calc(70vh * 9 / 16)); }
   }
   .video-caption { text-align: center; font-size: 0.85rem; color: var(--ink-soft); margin-top: 10px; font-style: italic; }
 
@@ -373,23 +428,23 @@
     display: flow-root;
     margin: 0 clamp(14px, 7%, 62px);
     background-color: var(--letter);
-    /* ket vizszintes hajtasnyom, mintha harmadolva lett volna osszehajtva */
+    /* ket vizszintes hajtasnyom, mintha harmadolva lett volna osszehajtva.
+       Szandekosan nagyon lagy es szeles atmenet, eles vonal nelkul - kulonben
+       ugy nezne ki, mintha a lap szele vagna at a szovegen. */
     background-image:
       linear-gradient(to bottom,
-        transparent calc(33.33% - 3px),
-        rgba(107, 84, 45, 0.035) calc(33.33% - 1px),
-        rgba(107, 84, 45, 0.07) 33.33%,
-        rgba(255, 253, 245, 0.4) calc(33.33% + 1.5px),
-        transparent calc(33.33% + 4px)),
+        transparent calc(33.33% - 10px),
+        rgba(107, 84, 45, 0.018) 33.33%,
+        transparent calc(33.33% + 10px)),
       linear-gradient(to bottom,
-        transparent calc(66.66% - 3px),
-        rgba(107, 84, 45, 0.035) calc(66.66% - 1px),
-        rgba(107, 84, 45, 0.07) 66.66%,
-        rgba(255, 253, 245, 0.4) calc(66.66% + 1.5px),
-        transparent calc(66.66% + 4px));
+        transparent calc(66.66% - 10px),
+        rgba(107, 84, 45, 0.018) 66.66%,
+        transparent calc(66.66% + 10px));
     border: 1px solid var(--letter-line);
     border-radius: 2px;
-    padding: clamp(22px, 4vw, 36px) clamp(20px, 4vw, 34px) 96px;
+    /* Az also belso margo bosegesen tobb, mint amennyit a boritek eltakar,
+       igy a szoveg soha nem fut ra a boritek felso elere. */
+    padding: clamp(22px, 4vw, 36px) clamp(20px, 4vw, 34px) 128px;
     box-shadow: 0 6px 16px -8px rgba(51, 41, 29, 0.4);
   }
   .sheet > p:last-child, .sheet > ul:last-child { margin-bottom: 0; }
@@ -659,6 +714,15 @@
   @media (max-width: 560px) {
     .donate-box { grid-template-columns: 1fr; }
     .envelope { --env-h: 215px; }
+
+    /* Telefonon a levelpapir kapja a helyet: kevesebb keret, szelesebb
+       szovegoszlop, es rendes tavolsag a papir szeletol. */
+    #ajandek.wrap { padding-left: 12px; padding-right: 12px; }
+    .keepsake { padding: 18px 10px; }
+    .sheet {
+      margin: 0 10px;
+      padding: 24px 20px 124px;
+    }
     .bell-shot { float: none; width: 150px; margin: 20px auto 24px; }
     .sheet .polaroid { float: none; width: 130px; margin: 0 auto 20px; }
     .env-stamp { width: 76px; }
@@ -688,15 +752,15 @@
 
 <!-- ================= VIDEO ================= -->
 <div class="video-section wrap">
-  <div class="video-embed">
-    <iframe
-      src="https://drive.google.com/file/d/1-rR02RNfI63ZmYYhKfs4uKSzFMs9cFyu/preview"
-      title="Meghívó videó &ndash; Kistom és Viktor 50"
-      allow="autoplay; fullscreen"
-      allowfullscreen
-      loading="lazy"></iframe>
+  <div class="video-embed" id="video-box">
+    <button class="video-cover" id="video-play" type="button" aria-label="Meghívó videó lejátszása hanggal">
+      <span class="ring">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+      </span>
+      <span class="cover-title">Meghívó videó</span>
+      <span class="cover-sub">Koppints a lejátszáshoz</span>
+    </button>
   </div>
-  <p class="video-caption">Ha a videó nem indulna el, <a href="https://drive.google.com/file/d/1-rR02RNfI63ZmYYhKfs4uKSzFMs9cFyu/view" target="_blank" rel="noopener">nyisd meg a Google Drive-ban</a>.</p>
 </div>
 
 <!-- ================= KEY INFO ================= -->
@@ -756,15 +820,14 @@
         <span class="cap">régi idők emléke</span>
       </div>
 
-      <h3 class="script-heading script">Kedves Barátaink!</h3>
-      <p>A legnagyobb ajándék számunkra az, hogy együtt ünnepelhetjük az 50. születésnapunkat.</p>
-      <p>Ha mégis szeretnétek meglepni valamivel, szeretnénk megosztani Veletek egy olyan ügyet, amely igazán közel áll a szívünkhöz.</p>
-      <p>Minden apró személyes ajándéknak nagyon örülünk, de idén arra kérjük, hogy ha ajándékra vagy akár egy üveg italra szántatok volna összeget, inkább segítsünk együtt megőrizni Kisszékely egyik legfontosabb értékét:</p>
+      <h3 class="script-heading script">Kedves barátaim!</h3>
+      <p>Egy apró kérésem lenne 😊</p>
+      <p>Kérlek, ne törjétek a fejeteket azon, mivel lepjetek meg a születésnapomon, ha mégis szeretnétek ajándékozni, inkább tegyük félre az erre szánt összeget, és mentsük meg együtt a kisszékelyi templom harangját! 🔔❤️⛪</p>
+      <p>Így egy kis születésnapi ajándékból valami igazán szép és maradandó születhet.</p>
       <p class="callout">
         <svg class="leaf" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 21c0-6 0-9 4-13M12 21c0-6 0-9-4-13M12 8c0-3 2-5 2-5s2 2 2 5-2 5-2 5-2-2-2-5Z"/></svg>
-        a templom harangjait
+        De a legfontosabb, hogy:<br>TI LEGYETEK OTT! 🥰❤️🥰
       </p>
-      <p>Hiszünk abban, hogy vannak ajándékok, amelyek túlmutatnak egyetlen napon. Egy felújított harang évtizedeken, sőt évszázadokon át hirdeti majd ünnepeinket, emlékeztet a közösség erejére, és arra, hogy ezt együtt valósítottuk meg.</p>
       </div>
       <svg class="env-front" viewBox="0 0 100 60" preserveAspectRatio="none" aria-hidden="true">
         <defs>
@@ -1093,6 +1156,30 @@
         flash(btn);
       }
     });
+  });
+})();
+</script>
+
+<script>
+(function () {
+  // --- Meghivo video: koppintasra HANGGAL indul, az oldalon belul ---
+  // A bongeszok csak nema videot engednek maguktol elindulni; egy valodi
+  // koppintas utan viszont a hang is mehet. Ezert toltjuk be a lejatszot
+  // csak a gombnyomas pillanataban, mar autoplay+hang beallitassal.
+  var VIDEO_ID = "tYfz92v5BhQ";
+  var box = document.getElementById("video-box");
+  var btn = document.getElementById("video-play");
+  if (!box || !btn) return;
+
+  btn.addEventListener("click", function () {
+    var frame = document.createElement("iframe");
+    frame.src = "https://www.youtube.com/embed/" + VIDEO_ID +
+                "?autoplay=1&playsinline=1&rel=0";
+    frame.title = "Meghívó videó – Kistom és Viktor 50";
+    frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+    frame.setAttribute("allowfullscreen", "");
+    frame.setAttribute("frameborder", "0");
+    box.replaceChildren(frame);
   });
 })();
 </script>
